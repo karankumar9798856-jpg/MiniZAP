@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MiniZAP - History</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -12,36 +13,65 @@
     <div class="logo"><i class="fas fa-bolt"></i> MiniZAP</div>
     <div class="nav-links">
         <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{{ url_for('profile') }}" class="nav-item"><i class="fas fa-user"></i> Profile</a>
+        <a href="{{ url_for('history') }}" class="nav-item active"><i class="fas fa-history"></i> History</a>
+        <a href="{{ url_for('about') }}" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
+        <a href="{{ url_for('logout') }}" style="color: #ef4444; margin-left: 20px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 </nav>
 
-<div class="report-container">
-    <div class="card">
-        <h3><i class="fas fa-history"></i> Scan History</h3>
-        <table class="history-table" style="margin-top: 20px;">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Target</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Feb 17, 2026</td>
-                    <td>google.com</td>
-                    <td><span class="severity-badge Low">Completed</span></td>
-                    <td><a href="#" style="color: #667eea;">View</a></td>
-                </tr>
-                <tr>
-                    <td>Feb 16, 2026</td>
-                    <td>testphp.vulnweb.com</td>
-                    <td><span class="severity-badge High">Issues Found</span></td>
-                    <td><a href="#" style="color: #667eea;">View</a></td>
-                </tr>
-            </tbody>
-        </table>
+<div class="dashboard-container">
+    <div class="card" style="width: 100%; min-height: 500px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div>
+                <h2><i class="fas fa-database"></i> Scan Archives</h2>
+                <p style="color: #64748b;">Manage and review your past security assessments.</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Target Website</th>
+                        <th>Risk Status</th>
+                        <th>Report</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if scans %}
+                        {% for scan in scans %}
+                        <tr>
+                            <td>{{ scan.scan_date }}</td>
+                            <td class="url-text">{{ scan.target_url }}</td>
+                            <td>
+                                <span class="risk-badge {{ scan.risk_level|lower }}">
+                                    {{ scan.risk_level }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if scan.report_path %}
+                                <a href="{{ url_for('static', filename='reports/' + scan.report_path) }}" target="_blank" class="view-btn">
+                                    <i class="fas fa-file-pdf"></i> View PDF
+                                </a>
+                                {% else %}
+                                <span style="color: #cbd5e1;">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 100px 0;">
+                                <i class="fas fa-folder-open" style="font-size: 50px; color: #e2e8f0; margin-bottom: 15px;"></i>
+                                <p style="color: #94a3b8;">No scan history found. Secure your first site now!</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
