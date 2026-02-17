@@ -355,12 +355,87 @@ a:hover { color: var(--primary-dark); }
     overflow-x: auto;
 }
 
-/* --- History Table --- */
-.history-table { width: 100%; border-collapse: collapse; }
-.history-table th { text-align: left; padding: 12px 15px; background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
-.history-table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
-.history-table tr:last-child td { border-bottom: none; }
+/* History Table Styles */
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 10px;
+}
 
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.history-table th {
+    background: #f8fafc;
+    padding: 15px;
+    color: #475569;
+    font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.history-table td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.url-text {
+    color: #4f46e5;
+    font-family: monospace;
+}
+
+/* Risk Badges */
+.risk-badge {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.risk-badge.high {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.risk-badge.low {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+/* --- Loading Spinner for Scan Button --- */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+    margin-left: 8px;
+}
+
+/* --- Card Hover Effect --- */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* --- Better Scrollbar for Terminal --- */
+.terminal-window::-webkit-scrollbar {
+    width: 6px;
+}
+.terminal-window::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 10px;
+}
 /* --- Flash Messages --- */
 .alert {
     padding: 12px;
