@@ -81,7 +81,7 @@ class SecurityScanner:
             '%2e%2e/%2e%2e/etc/passwd'
         ]
 
-        # 5. Top 50 Common Ports (Checking ALL 65k ports takes hours, these cover 90% risks)
+        # 5. Top 50 Common Ports
         self.target_ports = [
             21, 22, 23, 25, 53, 80, 110, 111, 135, 139, 143, 443, 445, 993, 995,
             1723, 3306, 3389, 5900, 8080, 8443, 8888, 9000, 9090, 27017, 6379, 11211
@@ -236,22 +236,31 @@ class SecurityScanner:
             for payload in self.sql_payloads:
                 url = f"{self.target}?{param}={payload}"
                 try:
-                    # Time-based Logic Check
                     start_time = time.time()
                     resp = self.session.get(url, timeout=10)
                     end_time = time.time()
                     
                     if self._is_false_positive(resp): continue
                     
-                    # Error Based
                     text = resp.text.lower()
                     if "syntax error" in text or "mysql" in text or "ora-" in text:
-                        vuln.append({'url': url, 'payload': payload, 'severity': 'CRITICAL', 'remediation': remediation})
+                        vuln.append({
+                            'url': url, 
+                            'payload': payload, 
+                            'severity': 'CRITICAL', # UI Red
+                            'remediation': remediation,
+                            'evidence': 'Database syntax error reflected in response'
+                        })
                         break
                     
-                    # Time Based (If delay > 5s)
                     if (end_time - start_time) > 5 and "SLEEP" in payload:
-                        vuln.append({'url': url, 'payload': payload, 'severity': 'CRITICAL', 'remediation': remediation})
+                        vuln.append({
+                            'url': url, 
+                            'payload': payload, 
+                            'severity': 'CRITICAL', # UI Red
+                            'remediation': remediation,
+                            'evidence': 'Delayed response confirmed Time-based SQLi'
+                        })
                         break
 
                 except: continue
@@ -273,7 +282,12 @@ class SecurityScanner:
                     self._delay_request()
                     resp = self.session.get(url, timeout=3)
                     if payload in resp.text:
-                        vuln.append({'url': url, 'severity': 'MEDIUM', 'remediation': remediation})
+                        vuln.append({
+                            'url': url, 
+                            'severity': 'HIGH', # UI Orange
+                            'remediation': remediation,
+                            'evidence': 'Unsanitized input reflected in page source'
+                        })
                 except: continue
         self.results['xss'] = vuln
         if vuln: self.log(f" -> Found {len(vuln)} XSS issues")
@@ -287,7 +301,13 @@ class SecurityScanner:
                 self._delay_request()
                 resp = self.session.get(url, timeout=3, allow_redirects=False)
                 if resp.status_code == 200 and not self._is_false_positive(resp):
-                    found.append({'file': f, 'url': url, 'severity': 'HIGH', 'remediation': remediation})
+                    found.append({
+                        'file': f, 
+                        'url': url, 
+                        'severity': 'HIGH', # UI Orange
+                        'remediation': remediation,
+                        'evidence': 'Publicly accessible sensitive configuration file'
+                    })
             except: pass
         self.results['sensitive_files'] = found
         if found: self.log(f" -> Found {len(found)} sensitive files")
@@ -302,7 +322,12 @@ class SecurityScanner:
                 try:
                     resp = self.session.get(url, timeout=3)
                     if "root:x:0:0" in resp.text or "[extensions]" in resp.text:
-                        vuln.append({'url': url, 'severity': 'CRITICAL', 'remediation': remediation})
+                        vuln.append({
+                            'url': url, 
+                            'severity': 'CRITICAL', # UI Red
+                            'remediation': remediation,
+                            'evidence': 'System file content leaked via path traversal'
+                        })
                         break
                 except: continue
         self.results['directory_traversal'] = vuln
@@ -322,16 +347,26 @@ class SecurityScanner:
             resp = self.session.head(self.target, timeout=5)
             for h, info in headers.items():
                 if h not in resp.headers:
-                    missing.append({'header': h, 'severity': 'LOW', 'description': 'Missing Header', 'fix_php': info['fix'], 'loc_php': info['loc'], 'fix_apache': f'Header set {h} ...', 'loc_apache': '.htaccess'})
+                    missing.append({
+                        'header': h, 
+                        'severity': 'LOW', # UI Blue
+                        'description': 'Missing Header', 
+                        'fix_php': info['fix'], 
+                        'loc_php': info['loc'], 
+                        'fix_apache': f'Header set {h} ...', 
+                        'loc_apache': '.htaccess'
+                    })
         except: pass
         self.results['missing_headers'] = missing
 
     # --- REPORTING ---
     def _generate_pdf_report(self):
         try:
+            # Ensure reports folder exists for your updated logic
+            if not os.path.exists('static/reports'): os.makedirs('static/reports')
+            
             filename = f"report_{uuid.uuid4().hex[:6]}.pdf"
-            if not os.path.exists('static'): os.makedirs('static')
-            filepath = os.path.join('static', filename)
+            filepath = os.path.join('static/reports', filename)
             
             pdf = FPDF()
             pdf.add_page()
@@ -352,10 +387,11 @@ class SecurityScanner:
                     pdf.cell(0, 10, cat.replace('_', ' ').upper(), ln=True)
                     pdf.set_text_color(0, 0, 0)
                     pdf.set_font("Arial", "", 10)
-                    for item in items[:15]: # Show top 15
+                    for item in items[:15]: 
                         if isinstance(item, dict):
-                            clean = {k:v for k,v in item.items() if k not in ['remediation', 'fix_php', 'loc_php', 'fix_apache', 'loc_apache']}
-                            pdf.multi_cell(0, 6, str(clean))
+                            # Professional clean view for PDF
+                            display_item = {k:v for k,v in item.items() if k not in ['remediation', 'fix_php', 'loc_php', 'fix_apache', 'loc_apache']}
+                            pdf.multi_cell(0, 6, str(display_item))
                         else:
                             pdf.multi_cell(0, 6, str(item))
                         pdf.ln(2)
@@ -363,4 +399,6 @@ class SecurityScanner:
             
             pdf.output(filepath)
             return filename
-        except: return None
+        except Exception as e:
+            print(f"PDF Error: {e}")
+            return None
