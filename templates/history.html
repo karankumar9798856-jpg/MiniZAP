@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MiniZAP - History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+
+<nav class="navbar">
+    <div class="logo"><i class="fas fa-bolt"></i> MiniZAP</div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    </div>
+</nav>
+
+<div class="report-container">
+    <div class="card">
+        <h3><i class="fas fa-history"></i> Scan History</h3>
+        <table class="history-table" style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Target</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Feb 17, 2026</td>
+                    <td>google.com</td>
+                    <td><span class="severity-badge Low">Completed</span></td>
+                    <td><a href="#" style="color: #667eea;">View</a></td>
+                </tr>
+                <tr>
+                    <td>Feb 16, 2026</td>
+                    <td>testphp.vulnweb.com</td>
+                    <td><span class="severity-badge High">Issues Found</span></td>
+                    <td><a href="#" style="color: #667eea;">View</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

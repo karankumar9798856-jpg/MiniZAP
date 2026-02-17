@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scan Report - MiniZAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+
+<nav class="navbar">
+    <div class="logo"><i class="fas fa-bolt"></i> MiniZAP</div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="report-container">
+    <div class="report-header">
+        <div class="header-content">
+            <h1><i class="fas fa-shield-alt"></i> Ultimate Security Report</h1>
+            <p class="target-url">Target: <a href="{{ target_url }}" target="_blank">{{ target_url }}</a></p>
+        </div>
+        <div class="header-actions">
+            {% if pdf_file %}
+            <a href="{{ url_for('static', filename=pdf_file) }}" target="_blank" class="btn-primary"><i class="fas fa-file-pdf"></i> Download PDF</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="recon-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        
+        <div class="card" style="margin-bottom: 0;">
+            <h3><i class="fas fa-layer-group"></i> Tech Stack</h3>
+            <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                {% if report.technology %}
+                    {% for tech in report.technology %}
+                        <li style="background: #f4f7f6; padding: 8px; margin-bottom: 5px; border-radius: 4px; border-left: 3px solid #2563eb;">{{ tech }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li style="color: #666;">No technology fingerprint detected.</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div class="card" style="margin-bottom: 0;">
+            <h3><i class="fas fa-network-wired"></i> Open Ports</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                {% if report.open_ports %}
+                    {% for port in report.open_ports %}
+                        <span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 13px; border: 1px solid #bae6fd;">Port {{ port }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span style="color: #666;">No critical ports open.</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0;">
+            <h3><i class="fas fa-globe"></i> Subdomains</h3>
+            <ul style="list-style: none; padding: 0; margin-top: 10px; max-height: 150px; overflow-y: auto;">
+                {% if report.subdomains %}
+                    {% for sub in report.subdomains %}
+                        <li style="font-size: 13px; padding: 4px 0; border-bottom: 1px solid #eee;"><i class="fas fa-link" style="color: #aaa; margin-right: 5px;"></i> {{ sub }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li style="color: #666;">No subdomains found.</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    {% for module, items in report.items() %}
+        {% if module not in ['technology', 'open_ports', 'subdomains'] %}
+        <div class="module-section">
+            <h3 class="module-title">
+                <i class="fas fa-bug"></i> {{ module|replace('_', ' ')|title }}
+                <span class="count-badge">{{ items|length }} Issues</span>
+            </h3>
+            
+            {% if items %}
+                <div class="accordion-group">
+                {% for item in items %}
+                    <div class="accordion-item {{ item.severity if item.severity else 'low' }}-border">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="header-left">
+                                <span class="severity-badge {{ item.severity if item.severity else 'INFO' }}">{{ item.severity if item.severity else 'INFO' }}</span>
+                                <span class="issue-title">
+                                    {{ item.url or item.file or item.header or 'Vulnerability Detected' }}
+                                </span>
+                            </div>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </div>
+                        
+                        <div class="accordion-content">
+                            <div class="details-box">
+                                
+                                <table class="details-table">
+                                    {% for key, value in item.items() %}
+                                        {% if key not in ['severity', 'remediation', 'fix_php', 'fix_apache', 'loc_php', 'loc_apache', 'description'] %}
+                                        <tr>
+                                            <th>{{ key|replace('_', ' ')|title }}</th>
+                                            <td><span class="highlight-code" style="word-break: break-all;">{{ value }}</span></td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </table>
+
+                                <div class="remediation-section">
+                                    <h4 style="color: #ef4444; font-size: 14px; margin-bottom: 10px;"><i class="fas fa-tools"></i> How to Fix</h4>
+                                    
+                                    {% if module == 'missing_headers' %}
+                                        <p style="font-size: 13px; color: #555; margin-bottom: 10px;">{{ item.description }}</p>
+                                        
+                                        {% if item.loc_php %}
+                                        <div class="code-recommendation">
+                                            <p class="code-label"><i class="fab fa-php"></i> PHP ({{ item.loc_php }})</p>
+                                            <pre class="code-block">{{ item.fix_php }}</pre>
+                                        </div>
+                                        {% endif %}
+
+                                        {% if item.loc_apache %}
+                                        <div class="code-recommendation">
+                                            <p class="code-label"><i class="fas fa-server"></i> Apache ({{ item.loc_apache }})</p>
+                                            <pre class="code-block">{{ item.fix_apache }}</pre>
+                                        </div>
+                                        {% endif %}
+
+                                    {% elif item.remediation %}
+                                        <p style="font-size: 13px; color: #555; margin-bottom: 10px;">{{ item.remediation.desc }}</p>
+
+                                        {% if item.remediation.php %}
+                                        <div class="code-recommendation">
+                                            <p class="code-label"><i class="fab fa-php"></i> Secure PHP Code:</p>
+                                            <pre class="code-block">{{ item.remediation.php }}</pre>
+                                        </div>
+                                        {% endif %}
+
+                                        {% if item.remediation.python %}
+                                        <div class="code-recommendation">
+                                            <p class="code-label"><i class="fab fa-python"></i> Secure Python Code:</p>
+                                            <pre class="code-block">{{ item.remediation.python }}</pre>
+                                        </div>
+                                        {% endif %}
+
+                                        {% if item.remediation.apache %}
+                                        <div class="code-recommendation">
+                                            <p class="code-label"><i class="fas fa-server"></i> .htaccess Rule:</p>
+                                            <pre class="code-block">{{ item.remediation.apache }}</pre>
+                                        </div>
+                                        {% endif %}
+
+                                        {% if item.remediation.general %}
+                                        <div class="code-recommendation">
+                                            <p class="code-label"><i class="fas fa-info-circle"></i> Recommendation:</p>
+                                            <pre class="code-block">{{ item.remediation.general }}</pre>
+                                        </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-issues"><i class="fas fa-check-circle"></i> No vulnerabilities found.</div>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+function toggleAccordion(element) {
+    const item = element.parentElement;
+    item.classList.toggle('active');
+}
+</script>
+
+</body>
+</html>

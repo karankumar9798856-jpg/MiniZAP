@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniZAP - Create Account</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="main-container">
+    <div class="login-card">
+        <div class="card-header">
+            <div class="logo-icon">
+                <i class="fas fa-user-shield" style="color: white; font-size: 30px;"></i>
+            </div>
+            <h2>Create Account</h2>
+            <p>Join MiniZAP Security Professional</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">
+                        <i class="fas fa-info-circle"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('register') }}">
+            
+            <div class="input-group">
+                <i class="fas fa-user icon"></i>
+                <input type="text" name="name" placeholder="Full Name" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-envelope icon"></i>
+                <input type="email" name="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-lock icon"></i>
+                <input type="password" name="password" id="regPassword" placeholder="Password" required onkeyup="checkPasswordStrength()">
+                <i class="fas fa-eye" id="toggleRegPass" onclick="togglePass('regPassword', 'toggleRegPass')" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; font-size: 14px;"></i>
+            </div>
+            
+            <div id="strength-meter" style="height: 4px; width: 0%; background: #e2e8f0; margin-top: -15px; margin-bottom: 20px; transition: 0.3s; border-radius: 2px;"></div>
+
+            <div class="input-group">
+                <i class="fas fa-check-circle icon"></i>
+                <input type="password" name="confirm_password" id="confirmPassword" placeholder="Confirm Password" required>
+                <i class="fas fa-eye" id="toggleConfirmPass" onclick="togglePass('confirmPassword', 'toggleConfirmPass')" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; font-size: 14px;"></i>
+            </div>
+
+            <div style="text-align: left; margin-bottom: 20px; font-size: 12px; color: #64748b;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" required style="accent-color: #6366f1;"> I agree to the <a href="#" style="color: #6366f1;">Terms of Service</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-login">Create Account <i class="fas fa-user-plus"></i></button>
+        </form>
+
+        <div class="card-footer" style="margin-top: 25px; font-size: 14px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+            <p>Already have an account? <a href="{{ url_for('login') }}" style="color: #6366f1; font-weight: 600;">Login here</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle Password Script
+    function togglePass(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+    }
+
+    // Password Strength Script
+    function checkPasswordStrength() {
+        const val = document.getElementById('regPassword').value;
+        const meter = document.getElementById('strength-meter');
+        if(val.length === 0) meter.style.width = '0%';
+        else if(val.length < 6) { meter.style.width = '30%'; meter.style.background = '#ef4444'; }
+        else if(val.length < 10) { meter.style.width = '60%'; meter.style.background = '#eab308'; }
+        else { meter.style.width = '100%'; meter.style.background = '#10b981'; }
+    }
+</script>
+
+</body>
+</html>

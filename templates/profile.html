@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MiniZAP - Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+
+<nav class="navbar">
+    <div class="logo"><i class="fas fa-bolt"></i> MiniZAP</div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="main-container" style="padding-top: 50px; align-items: flex-start;">
+    <div class="login-card" style="max-width: 600px;">
+        <div class="card-header">
+            <i class="fas fa-user-circle" style="font-size: 80px; color: #667eea; margin-bottom: 15px;"></i>
+            <h2>{{ user.name }}</h2>
+            <p>{{ user.email }}</p>
+        </div>
+        <div style="text-align: left; background: #f9f9f9; padding: 20px; border-radius: 8px;">
+            <p><strong>Account Type:</strong> <span style="color: green;">Premium</span></p>
+            <p style="margin-top: 10px;"><strong>Joined:</strong> {{ user.joined }}</p>
+            <p style="margin-top: 10px;"><strong>Last Login:</strong> Just now</p>
+        </div>
+        <button class="btn-login" style="margin-top: 20px;">Edit Profile</button>
+    </div>
+</div>
+
+</body>
+</html>

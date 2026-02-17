@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniZAP - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+
+<nav class="navbar">
+    <div class="logo"><i class="fas fa-bolt"></i> MiniZAP</div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{{ url_for('profile') }}" class="nav-item"><i class="fas fa-user"></i> Profile</a>
+        <a href="{{ url_for('history') }}" class="nav-item"><i class="fas fa-history"></i> History</a>
+       <a href="{{ url_for('about') }}" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+    
+    <div class="left-panel">
+        <div class="card">
+            <h3><i class="fas fa-search-location"></i> New Scan</h3>
+            <p style="margin-bottom: 15px; color: #666;">Enter a URL to detect vulnerabilities like SQLi & XSS.</p>
+            <form method="POST" id="scan-form">
+                <div class="input-group">
+                    <input type="url" name="target_url" placeholder="https://example.com" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                </div>
+                <button type="submit" id="scan-btn" class="btn-login" style="margin-top: 10px;">Start Scan <i class="fas fa-rocket"></i></button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-terminal"></i> Live Logs</h3>
+            <div class="terminal-window" id="logs">
+                <div class="prompt">> System Ready...</div>
+                {% if process_logs %}
+                    {% for log in process_logs %}
+                        <div class="prompt">> {{ log }}</div>
+                    {% endfor %}
+                {% else %}
+                    <div class="prompt">> Waiting for target URL...</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        
+        {% if report %}
+            
+            <div class="report-header" style="margin-top: 0;">
+                <div class="header-content">
+                    <h1><i class="fas fa-shield-alt"></i> Scan Results</h1>
+                    <p class="target-url">Target: {{ target_url }}</p>
+                </div>
+                <div class="header-actions">
+                    {% if pdf_file %}
+                    <a href="{{ url_for('static', filename=pdf_file) }}" target="_blank" class="btn-primary" style="font-size: 13px;"><i class="fas fa-file-pdf"></i> PDF</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="recon-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div class="card" style="margin-bottom: 0; padding: 15px;">
+                    <h4 style="font-size: 14px;"><i class="fas fa-layer-group"></i> Tech Stack</h4>
+                    <ul style="list-style: none; padding: 0; margin-top: 5px; font-size: 12px;">
+                        {% if report.technology %}
+                            {% for tech in report.technology %}
+                                <li style="border-bottom: 1px solid #eee; padding: 3px 0;">{{ tech }}</li>
+                            {% endfor %}
+                        {% else %}<li style="color:#999;">None detected</li>{% endif %}
+                    </ul>
+                </div>
+                <div class="card" style="margin-bottom: 0; padding: 15px;">
+                    <h4 style="font-size: 14px;"><i class="fas fa-network-wired"></i> Open Ports</h4>
+                    <div style="margin-top: 5px;">
+                        {% if report.open_ports %}
+                            {% for port in report.open_ports %}
+                                <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 3px;">{{ port }}</span>
+                            {% endfor %}
+                        {% else %}<span style="color:#999; font-size: 12px;">None open</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% for module, items in report.items() %}
+                {% if module not in ['technology', 'open_ports', 'subdomains'] %}
+                <div class="module-section" style="margin-bottom: 15px;">
+                    <h3 class="module-title" style="font-size: 15px;">
+                        <i class="fas fa-bug"></i> {{ module|replace('_', ' ')|title }}
+                        <span class="count-badge">{{ items|length }}</span>
+                    </h3>
+                    
+                    {% if items %}
+                        <div class="accordion-group">
+                        {% for item in items %}
+                            <div class="accordion-item {{ item.severity if item.severity else 'low' }}-border">
+                                <div class="accordion-header" onclick="toggleAccordion(this)" style="padding: 10px 15px;">
+                                    <div class="header-left">
+                                        <span class="severity-badge {{ item.severity if item.severity else 'INFO' }}" style="padding: 2px 6px; font-size: 10px;">{{ item.severity if item.severity else 'INFO' }}</span>
+                                        <span class="issue-title" style="font-size: 12px;">
+                                            {{ item.url or item.file or item.header or 'Issue Found' }}
+                                        </span>
+                                    </div>
+                                    <i class="fas fa-chevron-down toggle-icon" style="font-size: 12px;"></i>
+                                </div>
+                                
+                                <div class="accordion-content">
+                                    <div class="details-box" style="padding: 15px;">
+                                        {% if item.remediation %}
+                                        <div class="remediation-section" style="margin-top:0; border:none; padding-top:0;">
+                                            <h4 style="color: #ef4444; font-size: 13px; margin-bottom: 5px;">Fix:</h4>
+                                            <p style="font-size: 12px; color: #555; margin-bottom: 8px;">{{ item.remediation.desc }}</p>
+                                            
+                                            {% if item.remediation.php %}
+                                                <pre class="code-block" style="padding: 8px; font-size: 11px;">{{ item.remediation.php }}</pre>
+                                            {% endif %}
+                                            {% if item.fix_php %} <p style="font-size:11px; font-weight:bold;">PHP:</p>
+                                                <pre class="code-block" style="padding: 8px; font-size: 11px;">{{ item.fix_php }}</pre>
+                                            {% endif %}
+                                            {% if item.fix_apache %} <p style="font-size:11px; font-weight:bold;">.htaccess:</p>
+                                                <pre class="code-block" style="padding: 8px; font-size: 11px;">{{ item.fix_apache }}</pre>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-issues" style="font-size: 13px; padding: 10px; background: #f0fdf4; color: #166534; border-radius: 4px;">No issues found.</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+
+        {% else %}
+            <div class="card" style="text-align: center; padding: 80px 50px;">
+                <i class="fas fa-shield-alt" style="font-size: 60px; color: #e2e8f0; margin-bottom: 20px;"></i>
+                <h3 style="color: #0f172a;">Ready to Secure Your Web App?</h3>
+                <p style="color: #64748b; margin-top: 10px;">Start a new scan from the left panel to see detailed security reports here.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+    // Loading Animation for Button
+    document.getElementById('scan-form').addEventListener('submit', function() {
+        document.getElementById('scan-btn').innerHTML = 'Scanning... <i class="fas fa-spinner fa-spin"></i>';
+        document.getElementById('logs').innerHTML += '<div class="prompt" style="color: yellow;">> Initializing Scan...</div>';
+    });
+
+    // Accordion Logic
+    function toggleAccordion(element) {
+        const item = element.parentElement;
+        item.classList.toggle('active');
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniZAP | Security Intelligence Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .feature-card:hover { transform: translateY(-5px); transition: 0.3s; border-color: var(--primary) !important; }
+        .social-btn { transition: 0.2s; opacity: 0.8; text-decoration: none; }
+        .social-btn:hover { opacity: 1; transform: scale(1.1); }
+        .contact-item { display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 14px; white-space: nowrap; }
+        /* Fix for mobile screens */
+        @media (max-width: 768px) {
+            .contact-wrapper { flex-direction: column; gap: 15px !important; }
+            .profile-footer { flex-direction: column; gap: 20px; text-align: center; }
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-bolt"></i> <span>MiniZAP <small style="font-size: 10px; font-weight: normal; opacity: 0.7;">PRO</small></span>
+    </div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="fas fa-arrow-left"></i> Return to Console</a>
+    </div>
+</nav>
+
+<div class="main-container" style="padding: 50px 20px; flex-direction: column; align-items: center; gap: 30px;">
+    
+    <div class="login-card" style="max-width: 850px; width: 100%; text-align: left; border-top: 5px solid var(--primary); padding: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h1 style="color: var(--text-main); margin: 0; font-size: 28px;">Advanced Security Intelligence</h1>
+                <p style="color: var(--primary); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-size: 12px; margin-top: 5px;">
+                    Enterprise-Grade DAST Framework
+                </p>
+            </div>
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 12px;">
+                <i class="fas fa-shield-virus" style="font-size: 32px; color: var(--primary);"></i>
+            </div>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 16px; line-height: 1.8; margin-bottom: 30px;">
+            <strong>MiniZAP</strong> is an automated <b>Dynamic Application Security Testing (DAST)</b> engine meticulously crafted to identify critical security flaws. By simulating real-world cyberattacks, it helps developers pinpoint vulnerabilities like <b>SQL Injection, XSS, and Broken Authentication</b> before malicious actors can exploit them.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div class="feature-card" style="background: #ffffff; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <i class="fas fa-search-nodes" style="color: var(--primary); font-size: 24px; margin-bottom: 15px;"></i>
+                <h4 style="font-size: 16px; margin-bottom: 8px; color: var(--text-main);">Evidence-Based Analysis</h4>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Extracts raw response data as tangible proof of vulnerability, mirroring professional tools like OWASP ZAP.</p>
+            </div>
+            <div class="feature-card" style="background: #ffffff; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <i class="fas fa-code-merge" style="color: var(--success); font-size: 24px; margin-bottom: 15px;"></i>
+                <h4 style="font-size: 16px; margin-bottom: 8px; color: var(--text-main);">Intelligent Remediation</h4>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Provides instant source-code patches (PHP/Python) and server configurations to fix bugs immediately.</p>
+            </div>
+            <div class="feature-card" style="background: #ffffff; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <i class="fas fa-file-shield" style="color: #f59e0b; font-size: 24px; margin-bottom: 15px;"></i>
+                <h4 style="font-size: 16px; margin-bottom: 8px; color: var(--text-main);">Comprehensive Audits</h4>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Generates structured PDF reports detailing impact levels, payloads, and mitigation strategies for stakeholders.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-card" style="max-width: 850px; width: 100%; text-align: left; padding: 0; overflow: hidden; border: none; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 40px; color: white;">
+            <div style="display: flex; align-items: center; gap: 25px; flex-wrap: wrap;">
+                <div style="background: var(--primary); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; border: 4px solid rgba(255,255,255,0.1);">
+                    KK
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 24px; letter-spacing: 0.5px;">Karan Kumar</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #94a3b8; font-weight: 500;">Lead Security Researcher & Web Tester</p>
+                    <div style="margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span style="background: rgba(79, 70, 229, 0.2); border: 1px solid var(--primary); color: #c7d2fe; padding: 4px 12px; border-radius: 6px; font-size: 11px;">Penetration Testing</span>
+                        <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: #d1fae5; padding: 4px 12px; border-radius: 6px; font-size: 11px;">Prompt Coder</span>
+                        <span style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #fef3c7; padding: 4px 12px; border-radius: 6px; font-size: 11px;">Automation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-footer" style="padding: 30px 40px; display: flex; justify-content: space-between; align-items: center; background: white; flex-wrap: wrap; gap: 20px;">
+            <div class="contact-wrapper" style="display: flex; gap: 25px; flex-wrap: wrap;">
+                <div class="contact-item">
+                    <i class="fas fa-envelope" style="color: var(--primary);"></i> 
+                    <span>karankumar979885@gmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone" style="color: var(--primary);"></i> 
+                    <span>+91 97988 56816</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-location-dot" style="color: var(--primary);"></i> 
+                    <span>Bihar, India</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 20px;">
+                <a href="#" class="social-btn" style="color: #1e293b; font-size: 22px;"><i class="fab fa-github"></i></a>
+                <a href="#" class="social-btn" style="color: #0077b5; font-size: 22px;"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="social-btn" style="color: #ef4444; font-size: 22px;"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 50px;">
+        <p style="font-size: 12px; color: var(--text-muted); opacity: 0.7;">
+            MiniZAP Engine v2.0.1 Stable Build | Made with <i class="fas fa-heart" style="color: #ef4444;"></i> in India
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniZAP - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="main-container">
+    <div class="login-card">
+        <div class="card-header">
+            <div style="background: #6366f1; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-bolt" style="color: white; font-size: 30px;"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p>Login to start your security scan</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">
+                        <i class="fas fa-info-circle"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="input-group">
+                <i class="fas fa-envelope icon"></i>
+                <input type="email" name="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="input-group" style="position: relative;">
+                <i class="fas fa-lock icon"></i>
+                <input type="password" name="password" id="password" placeholder="Password" required>
+                <i class="fas fa-eye" id="togglePassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8;"></i>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: #64748b;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="remember" style="accent-color: #6366f1;"> Remember Me
+                </label>
+                <a href="#" style="color: #6366f1; font-weight: 500;">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-login">Login <i class="fas fa-sign-in-alt"></i></button>
+        </form>
+
+        <div class="card-footer" style="margin-top: 25px; font-size: 14px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+            <p>New here? <a href="{{ url_for('register') }}" style="color: #6366f1; font-weight: 600;">Create an Account</a></p>
+        </div>
+        
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 15px;">
+            <i class="fas fa-shield-alt"></i> Use for authorized testing only.
+        </p>
+    </div>
+</div>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+
+    togglePassword.addEventListener('click', function (e) {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('fa-eye-slash');
+    });
+</script>
+
+</body>
+</html>
